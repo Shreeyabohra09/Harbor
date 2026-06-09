@@ -1,0 +1,192 @@
+Here is the complete app code. Please replace everything with this. The app has two parts: a React frontend and an Express backend.
+BACKEND — server.js or index.js:
+javascriptconst express = require('express');
+const cors = require('cors');
+const Anthropic = require('@anthropic-ai/sdk');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+const SYSTEM_PROMPT = `You are the Re-Entry Agent — a warm, unhurried presence designed for one specific moment: when someone comes back to something they've been avoiding.
+
+Your job is not to make users productive. Your job is to make coming back feel survivable — emotionally safe enough that they can take one small step without it costing them everything.
+
+You are not a coach. You are not a therapist. You are not a productivity system.
+
+Your tone is: warm, quiet, unhurried. Like a friend who doesn't make a big deal out of the fact that you disappeared for a while. You never perform enthusiasm. You never celebrate streaks. You never reference how long someone was gone.
+
+RULES:
+1. NEVER reference how long the user was gone. Every conversation starts fresh. Always.
+2. NEVER mention streaks, consistency, habits, or progress tracking.
+3. NEVER jump to solutions before acknowledging the feeling.
+4. NEVER push the user toward a full session. One small thing is always enough.
+5. NEVER tell the user what their emotions mean.
+6. NEVER use exclamation points. NEVER say "amazing!" or "great job!" or "you've got this!"
+7. NEVER recommend other apps or productivity systems.
+8. NEVER ask more than one question at a time.
+9. NEVER give bullet point lists.
+10. Keep responses short — sentences, not paragraphs.
+11. If the user seems in genuine distress beyond task avoidance, say: "What you're sharing sounds like more than I can hold well. You deserve real support — someone who can really be there for you. Is there a person in your life you could reach out to tonight, or a counseling resource nearby?"
+
+THE ONE THING TO REMEMBER: The user almost didn't open this. Your job is to be the one thing that doesn't make it worse.`;
+
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { messages } = req.body;
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: SYSTEM_PROMPT,
+      messages
+    });
+    res.json({ content: response.content[0].text });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
+});
+
+app.use(express.static('dist'));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on ${PORT}`));
+FRONTEND — replace App.jsx with this:
+jsximport { useState, useRef, useEffect } from "react";
+
+const OPENING = "Coming back after a break can feel heavier than people expect. You're here. That already took something. What feels easiest to start with?";
+
+export default function App() {
+  const [screen, setScreen] = useState("opening");
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const bottomRef = useRef(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
+
+  const startChat = async () => {
+    setScreen("chat");
+    setLoading(true);
+    setMessages([{ role: "assistant", content: OPENING }]);
+    setLoading(false);
+  };
+
+  const send = async () => {
+    if (!input.trim() || loading) return;
+    const userMsg = { role: "user", content: input.trim() };
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
+    setInput("");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: newMessages.map(m => ({
+            role: m.role === "assistant" ? "assistant" : "user",
+            content: m.content
+          }))
+        })
+      });
+      const data = await res.json();
+      setMessages(prev => [...prev, { role: "assistant", content: data.content }]);
+    } catch {
+      setMessages(prev => [...prev, { role: "assistant", content: "Something went quiet on my end. Still here though — what were you saying?" }]);
+    }
+    setLoading(false);
+  };
+
+  const handleKey = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
+  };
+
+  if (screen === "opening") return (
+    <div style={s.opening}>
+      <div style={s.openingCard}>
+        <p style={s.eyebrow}>a quiet space for coming back</p>
+        <h1 style={s.title}>Re-<em style={s.italic}>Entry</em></h1>
+        <div style={s.divider} />
+        <p style={s.subtitle}>For when you've been away from something<br />and coming back feels harder than it should.</p>
+        <button style={s.cta} onClick={startChat}>I'm ready →</button>
+        <p style={s.note}>No account needed. No judgment either.</p>
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={s.chatWrap}>
+      <div style={s.header}>
+        <div style={s.dot} />
+        <span style={s.headerName}>Re-Entry</span>
+        <span style={s.headerStatus}>here with you</span>
+      </div>
+      <div style={s.messages}>
+        {messages.map((m, i) => (
+          <div key={i} style={m.role === "assistant" ? s.agentMsg : s.userMsg}>
+            <div style={m.role === "assistant" ? s.agentBubble : s.userBubble}>
+              {m.content}
+            </div>
+          </div>
+        ))}
+        {loading && (
+          <div style={s.agentMsg}>
+            <div style={s.agentBubble}>
+              <span style={s.typing}>· · ·</span>
+            </div>
+          </div>
+        )}
+        <div ref={bottomRef} />
+      </div>
+      <div style={s.inputArea}>
+        <textarea
+          style={s.input}
+          placeholder="whatever's on your mind..."
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={handleKey}
+          rows={1}
+        />
+        <button style={s.sendBtn} onClick={send} disabled={loading || !input.trim()}>→</button>
+      </div>
+    </div>
+  );
+}
+
+const c = {
+  cream: "#F7F3EE", creamy: "#EDE8E0", border: "#DDD5C8",
+  text: "#2C2420", muted: "#7A6E65", faint: "#A89E95",
+  agent: "#EFEBE4", accent: "#8B6F5E"
+};
+
+const s = {
+  opening: { minHeight: "100vh", background: c.cream, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Georgia, serif" },
+  openingCard: { maxWidth: 420, width: "100%", textAlign: "center", padding: "2rem" },
+  eyebrow: { fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: c.faint, marginBottom: 28, fontFamily: "system-ui, sans-serif" },
+  title: { fontSize: "clamp(3rem, 10vw, 5rem)", fontWeight: 400, color: c.text, marginBottom: 24, lineHeight: 1.1 },
+  italic: { fontStyle: "italic", color: c.accent },
+  divider: { width: 36, height: 1, background: c.border, margin: "0 auto 28px" },
+  subtitle: { fontSize: 15, lineHeight: 1.7, color: c.muted, marginBottom: 36, fontFamily: "system-ui, sans-serif", fontWeight: 300 },
+  cta: { background: c.text, color: c.cream, border: "none", padding: "12px 28px", borderRadius: 100, fontSize: 14, cursor: "pointer", fontFamily: "system-ui, sans-serif", marginBottom: 16 },
+  note: { fontSize: 12, color: c.faint, fontFamily: "system-ui, sans-serif" },
+  chatWrap: { display: "flex", flexDirection: "column", height: "100vh", background: c.cream, fontFamily: "system-ui, sans-serif" },
+  header: { display: "flex", alignItems: "center", gap: 10, padding: "16px 20px", borderBottom: `1px solid ${c.border}` },
+  dot: { width: 8, height: 8, borderRadius: "50%", background: c.accent, opacity: 0.7 },
+  headerName: { fontFamily: "Georgia, serif", fontSize: 16, color: c.text },
+  headerStatus: { fontSize: 12, color: c.faint, marginLeft: "auto" },
+  messages: { flex: 1, overflowY: "auto", padding: "24px 20px", display: "flex", flexDirection: "column", gap: 12 },
+  agentMsg: { alignSelf: "flex-start", maxWidth: "80%" },
+  userMsg: { alignSelf: "flex-end", maxWidth: "80%" },
+  agentBubble: { background: c.agent, color: c.text, padding: "12px 16px", borderRadius: 18, borderBottomLeftRadius: 4, fontSize: 15, lineHeight: 1.65, fontWeight: 300 },
+  userBubble: { background: c.text, color: c.cream, padding: "12px 16px", borderRadius: 18, borderBottomRightRadius: 4, fontSize: 15, lineHeight: 1.65, fontWeight: 300 },
+  typing: { color: c.faint, letterSpacing: 4 },
+  inputArea: { padding: "12px 16px 20px", borderTop: `1px solid ${c.border}`, display: "flex", gap: 10, alignItems: "flex-end" },
+  input: { flex: 1, background: c.creamy, border: `1px solid ${c.border}`, borderRadius: 14, padding: "10px 14px", fontSize: 14, fontFamily: "system-ui, sans-serif", color: c.text, resize: "none", outline: "none", lineHeight: 1.5 },
+  sendBtn: { width: 40, height: 40, borderRadius: "50%", background: c.text, color: c.cream, border: "none", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }
+};
+Please replace the existing app with exactly this code, keeping the ANTHROPIC_API_KEY secret already set.
