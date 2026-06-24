@@ -65,7 +65,6 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;font-weight:300;overflow:
 .wave3{animation:wave-move 12s linear infinite;opacity:0.3;bottom:16px}
 .chat-header{display:flex;align-items:center;gap:10px;padding:13px 16px;background:rgba(10,22,40,0.65);backdrop-filter:blur(10px);border-bottom:0.5px solid rgba(255,255,255,0.1);flex-shrink:0;z-index:5;position:relative}
 .header-dot{width:7px;height:7px;border-radius:50%;background:#5dade2;opacity:0.9}
-.header-name{font-family:'Lora',serif;font-size:15px;color:#f0f4f8;font-weight:400}
 .header-right{margin-left:auto;display:flex;align-items:center;gap:10px}
 .header-status{position:absolute;left:50%;transform:translateX(-50%);font-size:18px;color:rgba(255,255,255,0.92);font-family:'Lora',serif;font-style:italic;font-weight:400;letter-spacing:0.04em;white-space:nowrap}
 .start-over-btn{font-size:12px;background:rgba(255,255,255,0.18);color:#ffffff;border:1px solid rgba(255,255,255,0.45);padding:7px 18px;border-radius:100px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:400;letter-spacing:0.02em;transition:all 0.2s ease}
@@ -177,11 +176,78 @@ textarea:focus{border-color:rgba(93,173,226,0.6)}
 .fortune-new{font-size:10px;color:rgba(255,200,80,0.6);cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif;letter-spacing:0.04em;display:none;transition:color 0.2s}
 .fortune-new:hover{color:rgba(255,200,80,0.9)}
 .fortune-new.show{display:block}
+.cookie-tap-hint{font-size:10px;color:rgba(255,200,80,0.65);font-family:'DM Sans',sans-serif;letter-spacing:0.04em;text-align:center;margin-top:6px;transition:opacity 0.3s ease}
+.cookie-tap-hint.hidden{opacity:0;pointer-events:none}
 
 /* Constellation */
 .constellation-canvas{width:100%;height:110px;border-radius:10px;background:rgba(0,0,30,0.5);border:0.5px solid rgba(255,255,255,0.1);cursor:crosshair;display:block}
 .constellation-hint{font-size:10px;color:rgba(255,255,255,0.4);text-align:center}
 .constellation-clear{font-size:10px;color:rgba(255,200,80,0.5);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline}
+
+/* ── PAGE TRANSITIONS ── */
+.screen{opacity:0;transition:opacity 0.5s ease}
+.screen.active{opacity:1}
+.screen.fade-out{opacity:0;pointer-events:none}
+
+/* ── BUBBLE STREAM ANIMATION ── */
+@keyframes bubbleIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.bubble{animation:bubbleIn 0.3s ease both}
+
+/* ── HARBOR NAME IN HEADER ── */
+.header-name{font-family:'Lora',serif;font-size:17px;color:#f0f4f8;font-weight:400;font-style:italic}
+
+/* ── MOBILE LAYOUT ── */
+@media(max-width:600px){
+  /* Opening */
+  .opening-title{font-size:3.8rem}
+  .opening-sub{font-size:13px}
+  .cta-btn{padding:11px 24px;font-size:13px}
+
+  /* Mood */
+  .mood-question{font-size:1.4rem}
+  .mood-option{padding:12px 14px;gap:10px}
+  .mood-emoji{font-size:18px}
+
+  /* Chat layout — stack vertically on mobile, hide comfort corner as overlay */
+  #chat{flex-direction:column}
+  .chat-main{flex:1;min-height:0}
+
+  /* Comfort corner becomes bottom sheet on mobile */
+  .comfort-corner{width:100% !important;height:0;overflow:hidden;transition:height 0.4s cubic-bezier(0.4,0,0.2,1);flex-shrink:0}
+  .comfort-corner.open{height:60vh;width:100% !important}
+  .corner-inner-wrap{width:100% !important;height:100%}
+
+  /* String lights adapt to full width */
+  .string-lights svg{width:100%}
+
+  /* Feature rows more touch friendly */
+  .feature-btn{padding:14px 12px}
+  .feature-icon-wrap{width:42px;height:42px}
+  .feature-name{font-size:13px}
+  .feature-hint-text{font-size:11px}
+
+  /* Chat messages */
+  .chat-messages{padding:16px 14px}
+  .msg{max-width:90%}
+  .bubble{font-size:14px}
+
+  /* Header */
+  .header-status{font-size:13px}
+  .start-over-btn{font-size:11px;padding:5px 12px}
+  .header-name{font-size:14px}
+
+  /* Lantern — reposition for mobile */
+  .lantern-btn{bottom:auto;top:auto;right:12px;bottom:72px}
+  .lantern-glow{font-size:34px}
+  .lantern-label{font-size:14px}
+
+  /* Input */
+  .chat-input-wrap{padding:8px 12px 16px}
+  textarea{font-size:16px}
+
+  /* Mood options full width */
+  .mood-options{gap:8px}
+}
 
 </style>
 </head>
@@ -371,6 +437,7 @@ textarea:focus{border-color:rgba(93,173,226,0.6)}
                     <span class="cookie-half cookie-right">🥠</span>
                   </div>
                 </div>
+                <div class="cookie-tap-hint" id="cookieTapHint">Tap it to crack it!</div>
                 <div class="paper-strip" id="paperStrip">
                   <div class="paper-lines"></div>
                   <div class="fortune-text" id="fortuneText"></div>
@@ -416,7 +483,20 @@ inputEl.addEventListener('input',()=>{sendBtn.disabled=!inputEl.value.trim()||is
 function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px'}
 function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}}
 function scrollToBottom(){setTimeout(()=>{messagesEl.scrollTop=messagesEl.scrollHeight},50)}
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
+function showScreen(id){
+  const current=document.querySelector('.screen.active');
+  const next=document.getElementById(id);
+  if(current&&current!==next){
+    current.style.opacity='0';
+    setTimeout(()=>{
+      current.classList.remove('active');
+      current.style.opacity='';
+      next.classList.add('active');
+    },350);
+  } else {
+    next.classList.add('active');
+  }
+}
 function showMood(){showScreen('mood')}
 function startChat(mood){showScreen('chat');const o=OPENINGS[mood];addMessage('agent',o);messages.push({role:'assistant',content:o});inputEl.focus()}
 function resetChat(){messages=[];messagesEl.innerHTML='';isLoading=false;sendBtn.disabled=true;inputEl.value='';inputEl.style.height='auto';closeAllFeatures();showScreen('mood')}
@@ -437,9 +517,23 @@ function toggleBreath(){const p=document.getElementById('breathPanel');const o=p
 function stopBreath(){document.querySelectorAll('.breath-ring-big,.breath-center-big').forEach(r=>r.style.animationPlayState='paused')}
 function startBreath(){document.querySelectorAll('.breath-ring-big,.breath-center-big').forEach(r=>r.style.animationPlayState='running')}
 function toggleFortune(){const p=document.getElementById('fortunePanel');const o=p.classList.contains('open');closeAllFeatures();if(!o){p.classList.add('open');document.getElementById('fortuneBtn').classList.add('active');resetCookie()}}
-function resetCookie(){const w=document.getElementById('cookieWrap'),s=document.getElementById('paperStrip'),t=document.getElementById('fortuneText'),n=document.getElementById('fortuneNew');w.classList.remove('cracking');s.classList.remove('open');t.textContent='';n.classList.remove('show');document.getElementById('cookieWhole').style.opacity='1'}
-function crackCookie(){const w=document.getElementById('cookieWrap');if(w.classList.contains('cracking'))return;w.classList.add('cracking');setTimeout(()=>{const s=document.getElementById('paperStrip'),t=document.getElementById('fortuneText'),n=document.getElementById('fortuneNew');const f=FORTUNES[Math.floor(Math.random()*FORTUNES.length)];t.textContent=f;s.classList.add('open');setTimeout(()=>n.classList.add('show'),800)},400)}
-function newFortune(){resetCookie();setTimeout(crackCookie,300)}
+function resetCookie(){const w=document.getElementById('cookieWrap'),s=document.getElementById('paperStrip'),t=document.getElementById('fortuneText'),n=document.getElementById('fortuneNew'),h=document.getElementById('cookieTapHint');w.classList.remove('cracking');s.classList.remove('open');t.textContent='';n.classList.remove('show');document.getElementById('cookieWhole').style.opacity='1';if(h)h.classList.remove('hidden')}
+function playCrackSound(){try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const buf=ctx.createBuffer(1,ctx.sampleRate*0.15,ctx.sampleRate);const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.exp(-i/(ctx.sampleRate*0.04));const src=ctx.createBufferSource();src.buffer=buf;const g=ctx.createGain();g.gain.value=0.3;src.connect(g);g.connect(ctx.destination);src.start();setTimeout(()=>ctx.close(),500)}catch(e){}}
+function crackCookie(){const w=document.getElementById('cookieWrap');if(w.classList.contains('cracking'))return;playCrackSound();w.classList.add('cracking');const h=document.getElementById('cookieTapHint');if(h)h.classList.add('hidden');setTimeout(()=>{const s=document.getElementById('paperStrip'),t=document.getElementById('fortuneText'),n=document.getElementById('fortuneNew');const f=FORTUNES[Math.floor(Math.random()*FORTUNES.length)];t.textContent=f;s.classList.add('open');setTimeout(()=>n.classList.add('show'),800)},400)}
+function newFortune(){
+  const w=document.getElementById('cookieWrap'),s=document.getElementById('paperStrip'),n=document.getElementById('fortuneNew');
+  n.style.transition='opacity 0.25s ease';n.style.opacity='0';
+  s.style.transition='opacity 0.3s ease';s.style.opacity='0';
+  setTimeout(()=>{
+    w.style.transition='opacity 0.3s ease';w.style.opacity='0';
+    setTimeout(()=>{
+      resetCookie();
+      w.style.transition='';w.style.opacity='';
+      s.style.transition='';s.style.opacity='';
+      n.style.transition='';n.style.opacity='';
+    },300);
+  },250);
+}
 function toggleConstellation(){const p=document.getElementById('constPanel');const o=p.classList.contains('open');closeAllFeatures();if(!o){p.classList.add('open');document.getElementById('constBtn').classList.add('active');setTimeout(initConst,50)}}
 function initConst(){const canvas=document.getElementById('constCanvas');canvas.onclick=(e)=>{const rect=canvas.getBoundingClientRect(),x=(e.clientX-rect.left)*(canvas.width/rect.width),y=(e.clientY-rect.top)*(canvas.height/rect.height);constPoints.push({x,y});drawConst()};drawConst()}
 function drawConst(){const canvas=document.getElementById('constCanvas'),ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);if(constPoints.length>1){ctx.beginPath();ctx.moveTo(constPoints[0].x,constPoints[0].y);for(let i=1;i<constPoints.length;i++)ctx.lineTo(constPoints[i].x,constPoints[i].y);ctx.strokeStyle='rgba(255,220,120,0.3)';ctx.lineWidth=0.8;ctx.stroke()}constPoints.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,2.5,0,Math.PI*2);ctx.fillStyle='#ffd080';ctx.shadowBlur=6;ctx.shadowColor='#ffcc00';ctx.fill();ctx.shadowBlur=0})}
