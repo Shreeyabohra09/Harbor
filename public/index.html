@@ -63,13 +63,13 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;font-weight:300;overflow:
 .wave1{animation:wave-move 6s linear infinite;opacity:0.7;bottom:8px}
 .wave2{animation:wave-move 9s linear infinite reverse;opacity:0.5}
 .wave3{animation:wave-move 12s linear infinite;opacity:0.3;bottom:16px}
-.chat-header{display:flex;align-items:center;gap:10px;padding:13px 16px;background:rgba(10,22,40,0.65);backdrop-filter:blur(10px);border-bottom:0.5px solid rgba(255,255,255,0.1);flex-shrink:0;z-index:5}
+.chat-header{display:flex;align-items:center;gap:10px;padding:13px 16px;background:rgba(10,22,40,0.65);backdrop-filter:blur(10px);border-bottom:0.5px solid rgba(255,255,255,0.1);flex-shrink:0;z-index:5;position:relative}
 .header-dot{width:7px;height:7px;border-radius:50%;background:#5dade2;opacity:0.9}
 .header-name{font-family:'Lora',serif;font-size:15px;color:#f0f4f8;font-weight:400}
 .header-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-.header-status{font-size:10px;color:rgba(255,255,255,0.45)}
-.start-over-btn{font-size:11px;background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);border:0.5px solid rgba(255,255,255,0.2);padding:5px 12px;border-radius:100px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s ease}
-.start-over-btn:hover{background:rgba(255,255,255,0.2)}
+.header-status{position:absolute;left:50%;transform:translateX(-50%);font-size:18px;color:rgba(255,255,255,0.92);font-family:'Lora',serif;font-style:italic;font-weight:400;letter-spacing:0.04em;white-space:nowrap}
+.start-over-btn{font-size:12px;background:rgba(255,255,255,0.18);color:#ffffff;border:1px solid rgba(255,255,255,0.45);padding:7px 18px;border-radius:100px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:400;letter-spacing:0.02em;transition:all 0.2s ease}
+.start-over-btn:hover{background:rgba(255,255,255,0.28);border-color:rgba(255,255,255,0.65);transform:translateY(-1px)}
 .chat-messages{flex:1;overflow-y:auto;padding:24px 20px;display:flex;flex-direction:column;gap:12px;position:relative;z-index:2;max-width:680px;width:100%;margin:0 auto;align-self:center}
 .chat-messages::-webkit-scrollbar{width:3px}
 .chat-messages::-webkit-scrollbar-track{background:transparent}
@@ -99,38 +99,68 @@ textarea:focus{border-color:rgba(93,173,226,0.6)}
 .send-btn:disabled{opacity:0.3;cursor:not-allowed;transform:none}
 .send-btn svg{width:16px;height:16px;fill:white}
 .comfort-corner{width:0;flex-shrink:0;overflow:hidden;transition:width 0.4s cubic-bezier(0.4,0,0.2,1);position:relative}
-.comfort-corner.open{width:220px}
-.corner-inner-wrap{width:220px;height:100%;background:radial-gradient(ellipse at top center,#5c3200 0%,#3d1f00 30%,#2a1200 60%,#1a0a00 100%);position:relative;overflow:hidden;display:flex;flex-direction:column}
+.comfort-corner.open{width:240px}
+.corner-inner-wrap{width:240px;height:100%;background:radial-gradient(ellipse at top center,#5c3200 0%,#3d1f00 30%,#2a1200 60%,#1a0a00 100%);position:relative;overflow:hidden;display:flex;flex-direction:column}
 .corner-inner-wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:90px;background:radial-gradient(ellipse at top center,rgba(255,200,50,0.22) 0%,transparent 70%);pointer-events:none;z-index:1}
 .string-lights{position:absolute;top:0;left:0;right:0;height:64px;pointer-events:none;z-index:3}
 .string-lights svg{width:100%;height:100%;overflow:visible}
 .bulb{animation:bulbGlow var(--d,2s) ease-in-out infinite var(--delay,0s)}
-.corner-content{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:center;padding:72px 16px 20px;overflow-y:auto}
-.corner-title{font-family:'Dancing Script',cursive;font-size:22px;font-weight:600;color:rgba(255,220,120,0.9);margin-bottom:24px;text-align:center}
-.features-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 8px;width:100%;margin-bottom:16px}
-.feature-item{display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;padding:8px 4px;border-radius:12px;border:none;background:none;transition:transform 0.2s;font-family:'DM Sans',sans-serif}
-.feature-item:hover{transform:translateY(-3px)}
-.feature-big-icon{font-size:32px;line-height:1}
-.feature-name{font-size:11px;color:rgba(255,255,255,0.82);text-align:center;font-weight:300;letter-spacing:0.03em}
-.vinyl-big{width:36px;height:36px;border-radius:50%;background:conic-gradient(#1a1020 0deg,#3d2b52 30deg,#1a1020 60deg,#3d2b52 90deg,#1a1020 120deg,#3d2b52 150deg,#1a1020 180deg,#3d2b52 210deg,#1a1020 240deg,#3d2b52 270deg,#1a1020 300deg,#3d2b52 330deg,#1a1020 360deg);position:relative}
+.corner-content{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:center;padding:72px 14px 20px;overflow-y:auto;gap:4px}
+.corner-title{font-family:'Dancing Script',cursive;font-size:22px;font-weight:600;color:rgba(255,220,120,0.9);margin-bottom:16px;text-align:center}
+
+/* Vertical feature rows */
+.feature-row{width:100%;display:flex;flex-direction:column;gap:0}
+.feature-btn{display:flex;flex-direction:row;align-items:center;gap:14px;cursor:pointer;padding:12px 10px;border-radius:12px;border:none;background:none;transition:background 0.2s;font-family:'DM Sans',sans-serif;width:100%;text-align:left}
+.feature-btn:hover{background:rgba(255,200,80,0.08)}
+.feature-btn.active{background:rgba(255,200,80,0.1)}
+.feature-icon-wrap{width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.feature-big-icon{font-size:36px;line-height:1}
+.feature-text-col{display:flex;flex-direction:column;gap:2px}
+.feature-name{font-size:12px;color:rgba(255,255,255,0.9);font-weight:400;letter-spacing:0.02em}
+.feature-hint-text{font-size:10px;color:rgba(255,200,80,0.55);font-weight:300}
+
+/* Separator */
+.feature-sep{height:0.5px;background:rgba(255,200,80,0.1);margin:0 10px}
+
+/* Inline activity panels */
+.feature-panel{display:none;padding:8px 10px 14px;width:100%}
+.feature-panel.open{display:block}
+
+/* Vinyl */
+.vinyl-big{width:44px;height:44px;border-radius:50%;background:conic-gradient(#1a1020 0deg,#3d2b52 30deg,#1a1020 60deg,#3d2b52 90deg,#1a1020 120deg,#3d2b52 150deg,#1a1020 180deg,#3d2b52 210deg,#1a1020 240deg,#3d2b52 270deg,#1a1020 300deg,#3d2b52 330deg,#1a1020 360deg);position:relative;flex-shrink:0}
 .vinyl-big.spinning{animation:spin 3s linear infinite}
-.vinyl-big::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:11px;height:11px;border-radius:50%;background:radial-gradient(circle,#fff9e6 0%,#f9ca24 60%,#e67e22 100%)}
-.breath-big{width:36px;height:36px;border-radius:50%;border:2px solid rgba(255,200,80,0.6);display:flex;align-items:center;justify-content:center}
-.breath-big.active{animation:breathe 4s ease-in-out infinite}
-.breath-core{width:14px;height:14px;border-radius:50%;background:rgba(255,200,80,0.25)}
-.breath-big.active .breath-core{animation:breathe-c 4s ease-in-out infinite}
-.feature-item-full{display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;padding:8px 4px;border-radius:12px;border:none;background:none;transition:transform 0.2s;width:100%;font-family:'DM Sans',sans-serif}
-.feature-item-full:hover{transform:translateY(-3px)}
-.sound-picker{display:none;background:rgba(255,240,200,0.08);border:0.5px solid rgba(255,200,80,0.15);border-radius:12px;padding:6px;width:100%;margin-top:8px}
-.sound-picker.open{display:block}
-.sound-opt{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:12px;color:rgba(255,255,255,0.8);transition:background 0.15s;border:none;background:none;width:100%;font-family:'DM Sans',sans-serif}
+.vinyl-big::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:13px;height:13px;border-radius:50%;background:radial-gradient(circle,#fff9e6 0%,#f9ca24 60%,#e67e22 100%)}
+
+/* Sound picker */
+.sound-picker{background:rgba(255,240,200,0.06);border:0.5px solid rgba(255,200,80,0.12);border-radius:10px;padding:4px}
+.sound-opt{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:11px;color:rgba(255,255,255,0.8);transition:background 0.15s;border:none;background:none;width:100%;font-family:'DM Sans',sans-serif}
 .sound-opt:hover{background:rgba(255,200,80,0.1)}
 .sound-opt.active{color:#ffd080}
-.sound-icon{font-size:14px;width:20px}
-.fortune-area{display:none;flex-direction:column;align-items:center;gap:12px;width:100%;margin-top:8px}
-.fortune-area.open{display:flex}
-.cookie-scene{display:flex;flex-direction:column;align-items:center;gap:0;width:100%;position:relative;min-height:80px}
-.cookie-wrap{display:flex;align-items:center;justify-content:center;gap:0;cursor:pointer;position:relative;z-index:2}
+.sound-icon{font-size:13px;width:18px}
+
+/* Breathe icon — wave/ripple style */
+.breath-icon-wave{width:44px;height:44px;position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.breath-ring{position:absolute;border-radius:50%;border:1.5px solid rgba(255,200,80,0.7);animation:ringPulse 4s ease-in-out infinite}
+.breath-ring:nth-child(1){width:44px;height:44px;animation-delay:0s}
+.breath-ring:nth-child(2){width:32px;height:32px;animation-delay:0.5s;border-color:rgba(255,200,80,0.5)}
+.breath-ring:nth-child(3){width:20px;height:20px;animation-delay:1s;border-color:rgba(255,200,80,0.35)}
+.breath-center-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,200,80,0.8);z-index:1}
+@keyframes ringPulse{0%,100%{transform:scale(0.85);opacity:0.3}50%{transform:scale(1);opacity:1}}
+
+/* Breathe guide */
+.breath-guide-inner{display:flex;flex-direction:column;align-items:center;gap:10px}
+.breath-circle-big{width:70px;height:70px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;position:relative;margin:0 auto}
+.breath-ring-big{position:absolute;border-radius:50%;border:2px solid rgba(255,200,80,0.6);animation:ringPulse 4s ease-in-out infinite}
+.breath-ring-big:nth-child(1){width:70px;height:70px;animation-delay:0s}
+.breath-ring-big:nth-child(2){width:50px;height:50px;animation-delay:0.4s;border-color:rgba(255,200,80,0.45)}
+.breath-ring-big:nth-child(3){width:32px;height:32px;animation-delay:0.8s;border-color:rgba(255,200,80,0.3)}
+.breath-center-big{width:12px;height:12px;border-radius:50%;background:rgba(255,200,80,0.8);z-index:1;animation:breathe-c 4s ease-in-out infinite}
+.breath-instruction{font-size:10px;color:rgba(255,220,140,0.7);text-align:center;line-height:1.5}
+
+/* Fortune */
+.fortune-area{display:flex;flex-direction:column;align-items:center;gap:10px}
+.cookie-scene{display:flex;flex-direction:column;align-items:center;gap:0;width:100%;position:relative;min-height:60px}
+.cookie-wrap{display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;z-index:2}
 .cookie-whole{font-size:42px;line-height:1;display:block;transition:opacity 0.1s ease;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.4))}
 .cookie-halves{display:none;position:relative;width:52px;height:42px}
 .cookie-half{font-size:38px;line-height:1;position:absolute;top:0;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.4));transition:all 0.55s cubic-bezier(0.4,0,0.2,1)}
@@ -140,23 +170,16 @@ textarea:focus{border-color:rgba(93,173,226,0.6)}
 .cookie-wrap.cracking .cookie-halves{display:block}
 .cookie-wrap.cracking .cookie-left{transform:translateX(-22px) rotate(-30deg) translateY(-10px)}
 .cookie-wrap.cracking .cookie-right{transform:translateX(22px) rotate(30deg) translateY(-10px)}
-.paper-strip{width:140px;max-height:0;overflow:hidden;background:linear-gradient(135deg,#fffef0,#fff8d6);border-radius:4px;position:relative;transition:max-height 0.6s cubic-bezier(0.4,0,0.2,1) 0.35s,opacity 0.4s ease 0.35s;opacity:0;box-shadow:0 2px 12px rgba(0,0,0,0.25);margin-top:-4px}
+.paper-strip{width:160px;max-height:0;overflow:hidden;background:linear-gradient(135deg,#fffef0,#fff8d6);border-radius:4px;position:relative;transition:max-height 0.6s cubic-bezier(0.4,0,0.2,1) 0.35s,opacity 0.4s ease 0.35s;opacity:0;box-shadow:0 2px 12px rgba(0,0,0,0.25);margin-top:-4px}
 .paper-strip.open{max-height:120px;opacity:1}
 .paper-lines{position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(transparent,transparent 18px,rgba(100,150,200,0.12) 18px,rgba(100,150,200,0.12) 19px);border-radius:4px}
-.fortune-text{position:relative;z-index:1;font-size:10px;color:#5a4000;text-align:center;line-height:1.55;font-style:italic;padding:10px 10px;font-family:'DM Sans',sans-serif}
+.fortune-text{position:relative;z-index:1;font-size:10px;color:#5a4000;text-align:center;line-height:1.55;font-style:italic;padding:10px;font-family:'DM Sans',sans-serif}
 .fortune-new{font-size:10px;color:rgba(255,200,80,0.6);cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif;letter-spacing:0.04em;display:none;transition:color 0.2s}
 .fortune-new:hover{color:rgba(255,200,80,0.9)}
 .fortune-new.show{display:block}
-.breath-guide{display:none;flex-direction:column;align-items:center;gap:10px;width:100%;margin-top:8px}
-.breath-guide.open{display:flex}
-.breath-circle-big{width:60px;height:60px;border-radius:50%;border:2px solid rgba(255,200,80,0.5);display:flex;align-items:center;justify-content:center}
-.breath-circle-big.breathing{animation:breathe 4s ease-in-out infinite}
-.breath-core-big{width:28px;height:28px;border-radius:50%;background:rgba(255,200,80,0.2)}
-.breath-circle-big.breathing .breath-core-big{animation:breathe-c 4s ease-in-out infinite}
-.breath-instruction{font-size:11px;color:rgba(255,220,140,0.75);text-align:center;line-height:1.5}
-.constellation-area{display:none;flex-direction:column;align-items:center;gap:8px;width:100%;margin-top:8px}
-.constellation-area.open{display:flex}
-.constellation-canvas{width:100%;height:110px;border-radius:10px;background:rgba(0,0,30,0.5);border:0.5px solid rgba(255,255,255,0.1);cursor:crosshair}
+
+/* Constellation */
+.constellation-canvas{width:100%;height:110px;border-radius:10px;background:rgba(0,0,30,0.5);border:0.5px solid rgba(255,255,255,0.1);cursor:crosshair;display:block}
 .constellation-hint{font-size:10px;color:rgba(255,255,255,0.4);text-align:center}
 .constellation-clear{font-size:10px;color:rgba(255,200,80,0.5);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline}
 
@@ -274,55 +297,109 @@ textarea:focus{border-color:rgba(93,173,226,0.6)}
       </div>
       <div class="corner-content">
         <div class="corner-title">your cozy corner</div>
-        <div class="features-grid">
-          <button class="feature-item" onclick="toggleMusic()">
-            <div class="vinyl-big" id="vinyl"></div>
-            <span class="feature-name" id="musicLabel">Music</span>
-          </button>
-          <button class="feature-item" onclick="toggleBreath()">
-            <div class="breath-big" id="breathIcon"><div class="breath-core"></div></div>
-            <span class="feature-name">Breathe</span>
-          </button>
-          <button class="feature-item" onclick="toggleFortune()">
-            <div class="feature-big-icon">🥠</div>
-            <span class="feature-name">Fortune</span>
-          </button>
-          <button class="feature-item" onclick="toggleConstellation()">
-            <div class="feature-big-icon">✨</div>
-            <span class="feature-name">Stars</span>
-          </button>
-        </div>
 
-        <div class="sound-picker" id="soundPicker">
-          <button class="sound-opt" onclick="selectSound('rain')" data-s="rain"><span class="sound-icon">🌧️</span>Gentle Rain</button>
-          <button class="sound-opt" onclick="selectSound('ambient')" data-s="ambient"><span class="sound-icon">🌌</span>Ambient</button>
-          <button class="sound-opt" onclick="selectSound('tones')" data-s="tones"><span class="sound-icon">🎵</span>Soft Tones</button>
-          <button class="sound-opt" onclick="stopSound()" style="color:rgba(255,255,255,0.4)"><span class="sound-icon">⏹</span>Stop</button>
-        </div>
-        <div class="breath-guide" id="breathGuide">
-          <div class="breath-circle-big" id="breathCircle"><div class="breath-core-big"></div></div>
-          <div class="breath-instruction">breathe in as it expands<br>out as it contracts</div>
-        </div>
-        <div class="fortune-area" id="fortuneArea">
-          <div class="cookie-scene" id="cookieScene">
-            <div class="cookie-wrap" id="cookieWrap" onclick="crackCookie()">
-              <span class="cookie-whole" id="cookieWhole">🥠</span>
-              <div class="cookie-halves" id="cookieHalves">
-                <span class="cookie-half cookie-left">🥠</span>
-                <span class="cookie-half cookie-right">🥠</span>
-              </div>
+        <!-- MUSIC -->
+        <div class="feature-row">
+          <button class="feature-btn" id="musicBtn" onclick="toggleMusic()">
+            <div class="feature-icon-wrap">
+              <div class="vinyl-big" id="vinyl"></div>
             </div>
-            <div class="paper-strip" id="paperStrip">
-              <div class="paper-lines"></div>
-              <div class="fortune-text" id="fortuneText"></div>
+            <div class="feature-text-col">
+              <span class="feature-name" id="musicLabel">Calm your mind</span>
+              <span class="feature-hint-text">rain · ambient · tones</span>
+            </div>
+          </button>
+          <div class="feature-panel" id="soundPanel">
+            <div class="sound-picker">
+              <button class="sound-opt" onclick="selectSound('rain')" data-s="rain"><span class="sound-icon">🌧️</span>Gentle Rain</button>
+              <button class="sound-opt" onclick="selectSound('ambient')" data-s="ambient"><span class="sound-icon">🌌</span>Ambient</button>
+              <button class="sound-opt" onclick="selectSound('tones')" data-s="tones"><span class="sound-icon">🎵</span>Soft Tones</button>
+              <button class="sound-opt" onclick="stopSound()" style="color:rgba(255,255,255,0.4)"><span class="sound-icon">⏹</span>Stop</button>
             </div>
           </div>
-          <button class="fortune-new" id="fortuneNew" onclick="newFortune()">✦ crack another</button>
         </div>
-        <div class="constellation-area" id="constArea">
-          <canvas class="constellation-canvas" id="constCanvas" width="188" height="110"></canvas>
-          <div class="constellation-hint">tap to place stars</div>
-          <button class="constellation-clear" onclick="clearConst()">clear</button>
+        <div class="feature-sep"></div>
+
+        <!-- BREATHE -->
+        <div class="feature-row">
+          <button class="feature-btn" id="breathBtn" onclick="toggleBreath()">
+            <div class="feature-icon-wrap">
+              <div class="breath-icon-wave">
+                <div class="breath-ring"></div>
+                <div class="breath-ring"></div>
+                <div class="breath-ring"></div>
+                <div class="breath-center-dot"></div>
+              </div>
+            </div>
+            <div class="feature-text-col">
+              <span class="feature-name">Take a breather</span>
+              <span class="feature-hint-text">follow the rhythm</span>
+            </div>
+          </button>
+          <div class="feature-panel" id="breathPanel">
+            <div class="breath-guide-inner">
+              <div class="breath-circle-big">
+                <div class="breath-ring-big"></div>
+                <div class="breath-ring-big"></div>
+                <div class="breath-ring-big"></div>
+                <div class="breath-center-big"></div>
+              </div>
+              <div class="breath-instruction">breathe in as it expands<br>breathe out as it contracts</div>
+            </div>
+          </div>
+        </div>
+        <div class="feature-sep"></div>
+
+        <!-- FORTUNE -->
+        <div class="feature-row">
+          <button class="feature-btn" id="fortuneBtn" onclick="toggleFortune()">
+            <div class="feature-icon-wrap">
+              <span class="feature-big-icon">🥠</span>
+            </div>
+            <div class="feature-text-col">
+              <span class="feature-name">Crack a fortune note</span>
+              <span class="feature-hint-text">tap to open one</span>
+            </div>
+          </button>
+          <div class="feature-panel" id="fortunePanel">
+            <div class="fortune-area">
+              <div class="cookie-scene">
+                <div class="cookie-wrap" id="cookieWrap" onclick="crackCookie()">
+                  <span class="cookie-whole" id="cookieWhole">🥠</span>
+                  <div class="cookie-halves" id="cookieHalves">
+                    <span class="cookie-half cookie-left">🥠</span>
+                    <span class="cookie-half cookie-right">🥠</span>
+                  </div>
+                </div>
+                <div class="paper-strip" id="paperStrip">
+                  <div class="paper-lines"></div>
+                  <div class="fortune-text" id="fortuneText"></div>
+                </div>
+              </div>
+              <button class="fortune-new" id="fortuneNew" onclick="newFortune()">✦ crack another</button>
+            </div>
+          </div>
+        </div>
+        <div class="feature-sep"></div>
+
+        <!-- CONSTELLATION -->
+        <div class="feature-row">
+          <button class="feature-btn" id="constBtn" onclick="toggleConstellation()">
+            <div class="feature-icon-wrap">
+              <span class="feature-big-icon">✨</span>
+            </div>
+            <div class="feature-text-col">
+              <span class="feature-name">Draw a constellation</span>
+              <span class="feature-hint-text">tap to place stars</span>
+            </div>
+          </button>
+          <div class="feature-panel" id="constPanel">
+            <canvas class="constellation-canvas" id="constCanvas" width="210" height="110"></canvas>
+            <div style="display:flex;justify-content:space-between;margin-top:4px">
+              <div class="constellation-hint">tap to place stars</div>
+              <button class="constellation-clear" onclick="clearConst()">clear</button>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -348,21 +425,22 @@ function showTyping(){const d=document.createElement('div');d.className='typing'
 function hideTyping(){const t=document.getElementById('typing');if(t)t.remove()}
 async function sendMessage(){const text=inputEl.value.trim();if(!text||isLoading)return;inputEl.value='';inputEl.style.height='auto';sendBtn.disabled=true;isLoading=true;addMessage('user',text);messages.push({role:'user',content:text});showTyping();try{const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages})});hideTyping();if(!response.ok)throw new Error('e');const d=document.createElement('div');d.className='msg agent';const b=document.createElement('div');b.className='bubble';d.appendChild(b);messagesEl.appendChild(d);const reader=response.body.getReader(),decoder=new TextDecoder();let ft='';while(true){const{done,value}=await reader.read();if(done)break;const chunk=decoder.decode(value);for(const line of chunk.split('\n')){if(line.startsWith('data: ')){const data=line.slice(6);if(data==='[DONE]')break;try{const p=JSON.parse(data);if(p.text){ft+=p.text;b.textContent=ft;scrollToBottom()}}catch{}}}}messages.push({role:'assistant',content:ft})}catch{hideTyping();addMessage('agent',"Something went quiet on my end. Still here though — what were you saying?")}isLoading=false;sendBtn.disabled=!inputEl.value.trim();inputEl.focus()}
 function toggleCorner(){const el=document.getElementById('comfortCorner');cornOpen=!cornOpen;el.classList.toggle('open',cornOpen)}
-function closeAllFeatures(){document.getElementById('soundPicker').classList.remove('open');document.getElementById('breathGuide').classList.remove('open');document.getElementById('fortuneArea').classList.remove('open');document.getElementById('constArea').classList.remove('open');stopBreath();stopArt()}
+function closeAllFeatures(){['soundPanel','breathPanel','fortunePanel','constPanel'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('open')});['musicBtn','breathBtn','fortuneBtn','constBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('active')});stopBreath();stopArt()}
 function getCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx}
-function stopSound(){soundNodes.forEach(n=>{try{n.stop()}catch{}});soundNodes=[];isPlayingSound=false;selectedSound=null;document.getElementById('vinyl').classList.remove('spinning');document.getElementById('musicLabel').textContent='Music';document.querySelectorAll('.sound-opt').forEach(el=>el.classList.remove('active'))}
+function stopSound(){soundNodes.forEach(n=>{try{n.stop()}catch{}});soundNodes=[];isPlayingSound=false;selectedSound=null;document.getElementById('vinyl').classList.remove('spinning');document.getElementById('musicLabel').textContent='Calm your mind';document.querySelectorAll('.sound-opt').forEach(el=>el.classList.remove('active'))}
 function selectSound(key){stopSound();const ctx=getCtx();if(ctx.state==='suspended')ctx.resume();selectedSound=key;isPlayingSound=true;document.getElementById('vinyl').classList.add('spinning');const labels={rain:'🌧 Rain',ambient:'🌌 Ambient',tones:'🎵 Tones'};document.getElementById('musicLabel').textContent=labels[key];document.querySelector('[data-s="'+key+'"]')?.classList.add('active');if(key==='rain')playRain(ctx);else if(key==='ambient')playAmbient(ctx);else if(key==='tones')playTones(ctx)}
 function playRain(ctx){const buf=ctx.createBuffer(1,ctx.sampleRate*3,ctx.sampleRate),d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*0.15;const src=ctx.createBufferSource();src.buffer=buf;src.loop=true;const f=ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=1200;f.Q.value=0.3;const g=ctx.createGain();g.gain.value=0;g.gain.linearRampToValueAtTime(0.35,ctx.currentTime+2);src.connect(f);f.connect(g);g.connect(ctx.destination);src.start();soundNodes.push(src)}
 function playAmbient(ctx){[55,82.5,110,165].forEach((freq,i)=>{const osc=ctx.createOscillator();osc.type='sine';osc.frequency.value=freq;const g=ctx.createGain();g.gain.value=0;g.gain.linearRampToValueAtTime(0.04-i*0.008,ctx.currentTime+3);osc.connect(g);g.connect(ctx.destination);osc.start();soundNodes.push(osc)})}
 function playTones(ctx){const notes=[261.63,329.63,392.00,523.25];let t=ctx.currentTime+0.5;function s(){if(!isPlayingSound||selectedSound!=='tones')return;const note=notes[Math.floor(Math.random()*notes.length)];const osc=ctx.createOscillator();osc.type='sine';osc.frequency.value=note;const g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.06,t+0.3);g.gain.linearRampToValueAtTime(0,t+2.5);osc.connect(g);g.connect(ctx.destination);osc.start(t);osc.stop(t+2.8);soundNodes.push(osc);t+=2+Math.random()*3;setTimeout(s,Math.max(0,(t-ctx.currentTime-1)*1000))}s();s()}
-function toggleMusic(){const p=document.getElementById('soundPicker');const o=p.classList.contains('open');closeAllFeatures();if(!o)p.classList.add('open')}
-function toggleBreath(){const g=document.getElementById('breathGuide');const o=g.classList.contains('open');closeAllFeatures();if(!o){g.classList.add('open');document.getElementById('breathCircle').classList.add('breathing');document.getElementById('breathIcon').classList.add('active')}}
-function stopBreath(){document.getElementById('breathCircle').classList.remove('breathing');document.getElementById('breathIcon').classList.remove('active')}
-function toggleFortune(){const a=document.getElementById('fortuneArea');const o=a.classList.contains('open');closeAllFeatures();if(!o){a.classList.add('open');resetCookie()}}
+function toggleMusic(){const p=document.getElementById('soundPanel');const o=p.classList.contains('open');closeAllFeatures();if(!o){p.classList.add('open');document.getElementById('musicBtn').classList.add('active')}}
+function toggleBreath(){const p=document.getElementById('breathPanel');const o=p.classList.contains('open');closeAllFeatures();if(!o){p.classList.add('open');document.getElementById('breathBtn').classList.add('active');startBreath()}}
+function stopBreath(){document.querySelectorAll('.breath-ring-big,.breath-center-big').forEach(r=>r.style.animationPlayState='paused')}
+function startBreath(){document.querySelectorAll('.breath-ring-big,.breath-center-big').forEach(r=>r.style.animationPlayState='running')}
+function toggleFortune(){const p=document.getElementById('fortunePanel');const o=p.classList.contains('open');closeAllFeatures();if(!o){p.classList.add('open');document.getElementById('fortuneBtn').classList.add('active');resetCookie()}}
 function resetCookie(){const w=document.getElementById('cookieWrap'),s=document.getElementById('paperStrip'),t=document.getElementById('fortuneText'),n=document.getElementById('fortuneNew');w.classList.remove('cracking');s.classList.remove('open');t.textContent='';n.classList.remove('show');document.getElementById('cookieWhole').style.opacity='1'}
 function crackCookie(){const w=document.getElementById('cookieWrap');if(w.classList.contains('cracking'))return;w.classList.add('cracking');setTimeout(()=>{const s=document.getElementById('paperStrip'),t=document.getElementById('fortuneText'),n=document.getElementById('fortuneNew');const f=FORTUNES[Math.floor(Math.random()*FORTUNES.length)];t.textContent=f;s.classList.add('open');setTimeout(()=>n.classList.add('show'),800)},400)}
 function newFortune(){resetCookie();setTimeout(crackCookie,300)}
-function toggleConstellation(){const a=document.getElementById('constArea');const o=a.classList.contains('open');closeAllFeatures();if(!o){a.classList.add('open');setTimeout(initConst,50)}}
+function toggleConstellation(){const p=document.getElementById('constPanel');const o=p.classList.contains('open');closeAllFeatures();if(!o){p.classList.add('open');document.getElementById('constBtn').classList.add('active');setTimeout(initConst,50)}}
 function initConst(){const canvas=document.getElementById('constCanvas');canvas.onclick=(e)=>{const rect=canvas.getBoundingClientRect(),x=(e.clientX-rect.left)*(canvas.width/rect.width),y=(e.clientY-rect.top)*(canvas.height/rect.height);constPoints.push({x,y});drawConst()};drawConst()}
 function drawConst(){const canvas=document.getElementById('constCanvas'),ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);if(constPoints.length>1){ctx.beginPath();ctx.moveTo(constPoints[0].x,constPoints[0].y);for(let i=1;i<constPoints.length;i++)ctx.lineTo(constPoints[i].x,constPoints[i].y);ctx.strokeStyle='rgba(255,220,120,0.3)';ctx.lineWidth=0.8;ctx.stroke()}constPoints.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,2.5,0,Math.PI*2);ctx.fillStyle='#ffd080';ctx.shadowBlur=6;ctx.shadowColor='#ffcc00';ctx.fill();ctx.shadowBlur=0})}
 function clearConst(){constPoints=[];const canvas=document.getElementById('constCanvas');canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height)}
